@@ -11,6 +11,7 @@ import UIKit
 class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     let context = CIContext()
+    var original: UIImage?
 
     @IBOutlet var imageView: UIImageView!
     
@@ -24,18 +25,46 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
     
     @IBAction func applySepia() {
+        if original == nil {
+            return
+        }
+        
         let filter = CIFilter(name: "CISepiaTone")
         filter?.setValue(0.5, forKey: kCIInputIntensityKey)
-        filter?.setValue(CIImage(image: imageView.image!), forKey: kCIInputImageKey)
-        let output = filter?.outputImage
-        imageView.image = UIImage(cgImage: self.context.createCGImage(output!, from: output!.extent)!)
+        display(filter: filter!)
     }
 
+    @IBAction func applyNoir() {
+        if original == nil {
+            return
+        }
+        
+        let filter = CIFilter(name: "CIPhotoEffectNoir")
+        display(filter: filter!)
+        
+    }
+    
+    @IBAction func applyVintage() {
+        if original == nil {
+            return
+        }
+               
+        let filter = CIFilter(name: "CIPhotoEffectProcess")
+        display(filter: filter!)
+        
+    }
+    
+    func display(filter:CIFilter) {
+        filter.setValue(CIImage(image: original!), forKey: kCIInputImageKey)
+        let output = filter.outputImage
+        imageView.image = UIImage(cgImage: self.context.createCGImage(output!, from: output!.extent)!)
+    }
 
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         navigationController?.dismiss(animated: true, completion: nil)
         if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
             imageView.image = image
+            original = image
         }
     }
 }
